@@ -1,4 +1,4 @@
-﻿@model PruebaUnitaria.Models.Proveedore
+﻿@model Producto
 
 @{
     ViewData["Title"] = "Create";
@@ -10,6 +10,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - PruebaUnitaria</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -108,6 +109,12 @@
                 border-color: #43484d;
             }
 
+        .btn-danger {
+            color: #fff;
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
         .text-center {
             text-align: center;
         }
@@ -119,31 +126,79 @@
         h2 {
             margin-bottom: 20px;
         }
+
+        /* Estilos para el modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+            .close:hover,
+            .close:focus {
+                color: black;
+                text-decoration: none;
+                cursor: pointer;
+            }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2 class="text-center mt-5">Create</h2>
+        <h2 class="text-center mt-5">Crear nuevo producto</h2>
         <div class="card">
             <div class="card-header">
-                <h4 class="mb-0">Proveedor</h4>
+                <h4 class="mb-0">Producto</h4>
             </div>
             <div class="card-body">
-                <form asp-action="Create">
+                <form id="createForm" asp-action="Create">
+                    <div class="form-group">
+                        <label asp-for="IdProveedor" class="control-label">IdProveedor</label>
+                        <input asp-for="IdProveedor" class="form-control" />
+                        <span asp-validation-for="IdProveedor" class="text-danger"></span>
+                    </div>
+
                     <div class="form-group">
                         <label asp-for="Codigo" class="control-label">Código</label>
                         <input asp-for="Codigo" class="form-control" />
                         <span asp-validation-for="Codigo" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="RazonSocial" class="control-label">Razón Social</label>
-                        <input asp-for="RazonSocial" class="form-control" />
-                        <span asp-validation-for="RazonSocial" class="text-danger"></span>
+                        <label asp-for="Descripcion" class="control-label">Descripción</label>
+                        <input asp-for="Descripcion" class="form-control" />
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Rfc" class="control-label">RFC</label>
-                        <input asp-for="Rfc" class="form-control" />
-                        <span asp-validation-for="Rfc" class="text-danger"></span>
+                        <label asp-for="Unidad" class="control-label">Unidad</label>
+                        <input asp-for="Unidad" class="form-control" />
+                        <span asp-validation-for="Unidad" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Costo" class="control-label">Costo</label>
+                        <input asp-for="Costo" class="form-control" />
+                        <span asp-validation-for="Costo" class="text-danger"></span>
                     </div>
                     <div class="form-group text-center">
                         <button type="submit" class="btn btn-primary">Create</button>
@@ -154,13 +209,43 @@
         </div>
     </div>
 
+    <!-- Modal -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h5>Error</h5>
+            <p>El proveedor seleccionado no existe.</p>
+            <button class="btn btn-danger" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
     @section Scripts {
         @{
             await Html.RenderPartialAsync("_ValidationScriptsPartial");
         }
+        <script>
+            function closeModal() {
+                document.getElementById('errorModal').style.display = 'none';
+            }
+
+            function showModal() {
+                document.getElementById('errorModal').style.display = 'block';
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+                var hasErrors = @Html.Raw(Json.Serialize(ViewData.ModelState.Values.Any(v => v.Errors.Count > 0)));
+                if (hasErrors) {
+                    showModal();
+                }
+
+                document.getElementById("createForm").addEventListener("submit", function (event) {
+                    if (document.getElementById('errorModal').style.display === 'block') {
+                        event.preventDefault();
+                        closeModal();
+                    }
+                });
+            });
+        </script>
     }
 </body>
 </html>
-
-
-

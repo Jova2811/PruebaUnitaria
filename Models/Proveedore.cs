@@ -1,15 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
-namespace PruebaUnitaria.Models;
-
-public partial class Proveedore
+namespace PruebaUnitaria.Models
 {
-    public int IdProveedor { get; set; }
+    public partial class Proveedore
+    {
+        [Key]
+        public int IdProveedor { get; set; }
 
-    public string Codigo { get; set; } = null!;
+        [Required(ErrorMessage = "El campo Código es obligatorio.")]
+        [StringLength(20, ErrorMessage = "El campo Código no puede tener más de 20 caracteres.")]
+        public string Codigo { get; set; } = null!;
 
-    public string RazonSocial { get; set; } = null!;
+        [Required(ErrorMessage = "El campo Razón Social es obligatorio.")]
+        [StringLength(150, ErrorMessage = "El campo Razón Social no puede tener más de 150 caracteres.")]
+        public string RazonSocial { get; set; } = null!;
 
-    public string Rfc { get; set; } = null!;
+        [Required(ErrorMessage = "El campo RFC es obligatorio.")]
+        [StringLength(13, ErrorMessage = "El campo RFC no puede tener más de 13 caracteres.")]
+        public string Rfc { get; set; } = null!;
+
+        
+    }
 }

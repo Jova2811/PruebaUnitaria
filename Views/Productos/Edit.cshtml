@@ -1,0 +1,264 @@
+﻿@model Producto
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - PruebaUnitaria</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            padding: 15px;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            display: block;
+            width: 100%;
+            height: calc(1.5em + 0.75rem + 2px);
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #495057;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            box-shadow: none;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+            .form-control:focus {
+                color: #495057;
+                background-color: #fff;
+                border-color: #007bff;
+                outline: 0;
+                box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+            }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            border-radius: 5px;
+            padding: 10px 20px;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+            .btn-primary:hover {
+                background-color: #0056b3;
+                border-color: #004085;
+            }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            border-radius: 5px;
+            padding: 10px 20px;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+            .btn-secondary:hover {
+                background-color: #565e64;
+                border-color: #43484d;
+            }
+
+        .btn-danger {
+            color: #fff;
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-5 {
+            margin-top: 3rem;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        .fa {
+            margin-right: 5px;
+        }
+
+        .validation-summary-errors {
+            color: red;
+            margin-bottom: 20px;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .justify-content-center {
+            justify-content: center;
+        }
+
+        .gap-2 {
+            gap: 10px;
+        }
+
+        /* Estilos para el modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+            .close:hover,
+            .close:focus {
+                color: black;
+                text-decoration: none;
+                cursor: pointer;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center mt-5">Edit</h2>
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Producto</h4>
+            </div>
+            <div class="card-body">
+                <form id="editForm" asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+                    <input type="hidden" asp-for="IdProducto" />
+                    <div class="form-group">
+                        <label asp-for="IdProveedor" class="control-label"></label>
+                        <input asp-for="IdProveedor" class="form-control" />
+                        <span asp-validation-for="IdProveedor" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Codigo" class="control-label"></label>
+                        <input asp-for="Codigo" class="form-control" />
+                        <span asp-validation-for="Codigo" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Descripcion" class="control-label"></label>
+                        <input asp-for="Descripcion" class="form-control" />
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Unidad" class="control-label"></label>
+                        <input asp-for="Unidad" class="form-control" />
+                        <span asp-validation-for="Unidad" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Costo" class="control-label"></label>
+                        <input asp-for="Costo" class="form-control" />
+                        <span asp-validation-for="Costo" class="text-danger"></span>
+                    </div>
+                    <div class="form-group d-flex justify-content-center gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
+                        <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back to List</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h5>Error</h5>
+            <p>El proveedor seleccionado no existe.</p>
+            <button class="btn btn-danger" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+        <script>
+            function closeModal() {
+                document.getElementById('errorModal').style.display = 'none';
+            }
+
+            function showModal() {
+                document.getElementById('errorModal').style.display = 'block';
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+                var hasErrors = @Html.Raw(Json.Serialize(ViewData.ModelState.Values.Any(v => v.Errors.Count > 0)));
+                if (hasErrors) {
+                    showModal();
+                }
+
+                document.getElementById("editForm").addEventListener("submit", function (event) {
+                    if (document.getElementById('errorModal').style.display === 'block') {
+                        event.preventDefault();
+                        closeModal();
+                    }
+                });
+            });
+        </script>
+    }
+</body>
+</html>

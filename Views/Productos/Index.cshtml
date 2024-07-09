@@ -1,4 +1,4 @@
-﻿@model IEnumerable<PruebaUnitaria.Models.Proveedore>
+﻿@model IEnumerable<PruebaUnitaria.Models.Producto>
 
 @{
     ViewData["Title"] = "Index";
@@ -31,16 +31,16 @@
             .table th,
             .table td {
                 padding: 0.75rem;
-                vertical-align: middle; /* Cambiado a middle */
+                vertical-align: middle;
                 border-top: 1px solid #dee2e6;
             }
 
             .table thead th {
-                vertical-align: middle; /* Cambiado a middle */
+                vertical-align: middle;
                 border-bottom: 2px solid #dee2e6;
                 background-color: #007bff;
                 color: white;
-                text-align: center; /* Añadido para centrar el texto */
+                text-align: center;
             }
 
             .table tbody + tbody {
@@ -125,7 +125,7 @@
         .actions {
             display: flex;
             justify-content: center;
-            gap: 5px; /* Espacio entre botones */
+            gap: 5px;
         }
     </style>
 </head>
@@ -136,10 +136,12 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
+                    <th>IdProducto</th>
                     <th>IdProveedor</th>
                     <th>Codigo</th>
-                    <th>RazonSocial</th>
-                    <th>Rfc</th>
+                    <th>Descripcion</th>
+                    <th>Unidad</th>
+                    <th>Costo</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -147,15 +149,17 @@
                 @foreach (var item in Model)
                 {
                     <tr>
+                        <td>@item.IdProducto</td>
                         <td>@item.IdProveedor</td>
                         <td>@item.Codigo</td>
-                        <td>@item.RazonSocial</td>
-                        <td>@item.Rfc</td>
+                        <td>@item.Descripcion</td>
+                        <td>@item.Unidad</td>
+                        <td>@item.Costo</td>
                         <td>
                             <div class="actions">
-                                <a asp-action="Edit" asp-route-id="@item.IdProveedor" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i> Edit</a>
-                                <a asp-action="Details" asp-route-id="@item.IdProveedor" class="btn btn-sm btn-info"><i class="fa fa-info-circle"></i> Details</a>
-                                <a asp-action="Delete" asp-route-id="@item.IdProveedor" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i> Delete</a>
+                                <a asp-action="Edit" asp-route-id="@item.IdProducto" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i> Edit</a>
+                                <a asp-action="Details" asp-route-id="@item.IdProducto" class="btn btn-sm btn-info"><i class="fa fa-info-circle"></i> Details</a>
+                                <a asp-action="Delete" asp-route-id="@item.IdProducto" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i> Delete</a>
                             </div>
                         </td>
                     </tr>
