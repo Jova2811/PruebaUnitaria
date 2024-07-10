@@ -103,9 +103,6 @@ namespace PruebaUnitaria.Controllers
             return View(proveedore);
         }
 
-        // POST: Proveedores/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("IdProveedor,Codigo,RazonSocial,Rfc")] Proveedore proveedore)
@@ -125,15 +122,26 @@ namespace PruebaUnitaria.Controllers
             {
                 try
                 {
-                    _context.Update(proveedore);
+                    var existingProveedor = await _context.Proveedores.FindAsync(id);
+                    if (existingProveedor == null)
+                    {
+                        return Json(new { success = false, message = "Proveedor no encontrado." });
+                    }
+
+                    existingProveedor.Codigo = !string.IsNullOrEmpty(proveedore.Codigo) ? proveedore.Codigo : existingProveedor.Codigo;
+                    existingProveedor.RazonSocial = !string.IsNullOrEmpty(proveedore.RazonSocial) ? proveedore.RazonSocial : existingProveedor.RazonSocial;
+                    existingProveedor.Rfc = !string.IsNullOrEmpty(proveedore.Rfc) ? proveedore.Rfc : existingProveedor.Rfc;
+
+                    _context.Update(existingProveedor);
                     await _context.SaveChangesAsync();
+
                     return Json(new { success = true, message = "El proveedor se ha actualizado correctamente." });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!ProveedoreExists(proveedore.IdProveedor))
                     {
-                        return Json(new { success = false, message = "El proveedor no existe." });
+                        return Json(new { success = false, message = "Proveedor no encontrado." });
                     }
                     else
                     {
@@ -157,13 +165,10 @@ namespace PruebaUnitaria.Controllers
             return _context.Proveedores.Any(e => e.IdProveedor == id);
         }
 
-
-
-
         // GET: Proveedores/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (id == null || _context.Proveedores == null)
             {
                 return NotFound();
             }

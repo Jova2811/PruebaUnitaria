@@ -131,13 +131,13 @@ namespace PruebaUnitaria.Controllers
                 return Json(new { success = false, message = "El ID del producto no coincide." });
             }
 
-            
+
             if (!_context.Proveedores.Any(p => p.IdProveedor == producto.IdProveedor))
             {
                 ModelState.AddModelError("IdProveedor", "El proveedor seleccionado no existe.");
             }
 
-            
+
             if (_context.Productos.Any(p => p.Codigo == producto.Codigo && p.IdProducto != producto.IdProducto))
             {
                 ModelState.AddModelError("Codigo", "El código del producto ya existe.");
@@ -185,9 +185,11 @@ namespace PruebaUnitaria.Controllers
                     return Json(new { success = false, message = "Hubo un error al actualizar el producto: " + ex.Message });
                 }
             }
-
-            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-            return Json(new { success = false, errors });
+            else
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return Json(new { success = false, errors });
+            }
         }
 
         private bool ProductoExists(int id)
@@ -206,8 +208,7 @@ namespace PruebaUnitaria.Controllers
                 return NotFound();
             }
 
-            var producto = await _context.Productos
-                .FirstOrDefaultAsync(m => m.IdProducto == id);
+            var producto = await _context.Productos.FirstOrDefaultAsync(m => m.IdProducto == id);
             if (producto == null)
             {
                 return NotFound();
