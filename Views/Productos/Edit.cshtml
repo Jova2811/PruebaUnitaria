@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Edit";
+
+    var provee = ViewBag.Provedores as List<Proveedore> ?? new List<Proveedore>();
 }
 
 <!DOCTYPE html>
@@ -139,126 +141,116 @@
             gap: 10px;
         }
 
-        /* Estilos para el modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 400px;
-            border-radius: 10px;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-            .close:hover,
-            .close:focus {
-                color: black;
-                text-decoration: none;
-                cursor: pointer;
-            }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2 class="text-center mt-5">Edit</h2>
+        <h2 class="text-center mt-5">Editar producto</h2>
         <div class="card">
             <div class="card-header">
                 <h4 class="mb-0">Producto</h4>
             </div>
             <div class="card-body">
-                <form id="editForm" asp-action="Edit">
-                    <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+                <form id="createForm" asp-action="Edit">
                     <input type="hidden" asp-for="IdProducto" />
                     <div class="form-group">
-                        <label asp-for="IdProveedor" class="control-label"></label>
-                        <input asp-for="IdProveedor" class="form-control" />
+                        <select asp-for="IdProveedor" class="form-control">
+                            @foreach (var proveedor in provee)
+                            {
+                                <option value="@proveedor.IdProveedor">@proveedor.Codigo</option>
+                            }
+                        </select>
                         <span asp-validation-for="IdProveedor" class="text-danger"></span>
                     </div>
+
                     <div class="form-group">
-                        <label asp-for="Codigo" class="control-label"></label>
+                        <label asp-for="Codigo" class="control-label">Código</label>
                         <input asp-for="Codigo" class="form-control" />
                         <span asp-validation-for="Codigo" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Descripcion" class="control-label"></label>
+                        <label asp-for="Descripcion" class="control-label">Descripción</label>
                         <input asp-for="Descripcion" class="form-control" />
                         <span asp-validation-for="Descripcion" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Unidad" class="control-label"></label>
+                        <label asp-for="Unidad" class="control-label">Unidad</label>
                         <input asp-for="Unidad" class="form-control" />
                         <span asp-validation-for="Unidad" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Costo" class="control-label"></label>
+                        <label asp-for="Costo" class="control-label">Costo</label>
                         <input asp-for="Costo" class="form-control" />
                         <span asp-validation-for="Costo" class="text-danger"></span>
                     </div>
-                    <div class="form-group d-flex justify-content-center gap-2">
-                        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
-                        <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back to List</a>
+                    <div class="form-group text-center">
+                        <button id="submitBtn" type="submit" class="btn btn-primary">Guardar</button>
+                        <a asp-action="Index" class="btn btn-secondary">Regresar</a>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Modal -->
-    <div id="errorModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h5>Error</h5>
-            <p>El proveedor seleccionado no existe.</p>
-            <button class="btn btn-danger" onclick="closeModal()">Close</button>
-        </div>
-    </div>
-
     @section Scripts {
-        @{
-            await Html.RenderPartialAsync("_ValidationScriptsPartial");
-        }
+        <partial name="_ValidationScriptsPartial" />
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
-            function closeModal() {
-                document.getElementById('errorModal').style.display = 'none';
-            }
+            $(document).ready(function () {
+                $('#submitBtn').on('click', function (e) {
+                    e.preventDefault(); 
 
-            function showModal() {
-                document.getElementById('errorModal').style.display = 'block';
-            }
-
-            document.addEventListener("DOMContentLoaded", function () {
-                var hasErrors = @Html.Raw(Json.Serialize(ViewData.ModelState.Values.Any(v => v.Errors.Count > 0)));
-                if (hasErrors) {
-                    showModal();
-                }
-
-                document.getElementById("editForm").addEventListener("submit", function (event) {
-                    if (document.getElementById('errorModal').style.display === 'block') {
-                        event.preventDefault();
-                        closeModal();
-                    }
+                   
+                    $.ajax({
+                        url: '@Url.Action("Edit", "Productos")',
+                        method: 'POST',
+                        data: $('#createForm').serialize(),
+                        success: function (data) {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Éxito!',
+                                    text: data.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(function () {
+                                    window.location.href = '@Url.Action("Index", "Productos")';
+                                });
+                            } else {
+                                if (data.errors && data.errors.length > 0) {
+                                    var errorMessage = "<ul>";
+                                    $.each(data.errors, function (key, value) {
+                                        errorMessage += "<li>" + value + "</li>";
+                                    });
+                                    errorMessage += "</ul>";
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error!',
+                                        html: errorMessage
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error!',
+                                        text: 'Hubo un problema al actualizar el producto: ' + data.message
+                                    });
+                                }
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: 'Hubo un problema al actualizar el producto.'
+                            });
+                        }
+                    });
                 });
             });
         </script>
     }
 </body>
+
+
 </html>

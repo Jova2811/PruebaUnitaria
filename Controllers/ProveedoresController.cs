@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using PruebaUnitaria.Models;
 
@@ -21,9 +22,11 @@ namespace PruebaUnitaria.Controllers
         // GET: Proveedores
         public async Task<IActionResult> Index()
         {
-              return _context.Proveedores != null ? 
-                          View(await _context.Proveedores.ToListAsync()) :
-                          Problem("Entity set 'DbPracticaContext.Proveedores'  is null.");
+            var proveedores = _context.Proveedores.ToList(); 
+            
+
+            return View(proveedores);
+
         }
 
         // GET: Proveedores/Details/5
@@ -47,6 +50,7 @@ namespace PruebaUnitaria.Controllers
         // GET: Proveedores/Create
         public IActionResult Create()
         {
+            
             return View();
         }
 
@@ -57,14 +61,31 @@ namespace PruebaUnitaria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IdProveedor,Codigo,RazonSocial,Rfc")] Proveedore proveedore)
         {
+            if (_context.Proveedores.Any(p => p.Codigo == proveedore.Codigo))
+            {
+                ModelState.AddModelError("Codigo", "El código del proveedor ya existe.");
+            }
+
             if (ModelState.IsValid)
             {
-                _context.Add(proveedore);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Add(proveedore);
+                    await _context.SaveChangesAsync();
+                    return Json(new { success = true, message = "El proveedor se ha creado correctamente." });
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, message = "Hubo un problema al crear el proveedor: " + ex.Message });
+                }
             }
-            return View(proveedore);
+            else
+            {
+                var errorList = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return Json(new { success = false, errors = errorList });
+            }
         }
+
 
         // GET: Proveedores/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -91,7 +112,13 @@ namespace PruebaUnitaria.Controllers
         {
             if (id != proveedore.IdProveedor)
             {
-                return NotFound();
+                return Json(new { success = false, message = "El ID del proveedor no coincide." });
+            }
+
+            // Validación para el Codigo
+            if (_context.Proveedores.Any(p => p.Codigo == proveedore.Codigo && p.IdProveedor != proveedore.IdProveedor))
+            {
+                ModelState.AddModelError("Codigo", "El código del proveedor ya existe.");
             }
 
             if (ModelState.IsValid)
@@ -100,63 +127,130 @@ namespace PruebaUnitaria.Controllers
                 {
                     _context.Update(proveedore);
                     await _context.SaveChangesAsync();
+                    return Json(new { success = true, message = "El proveedor se ha actualizado correctamente." });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!ProveedoreExists(proveedore.IdProveedor))
                     {
-                        return NotFound();
+                        return Json(new { success = false, message = "El proveedor no existe." });
                     }
                     else
                     {
-                        throw;
+                        return Json(new { success = false, message = "Hubo un problema de concurrencia al actualizar el proveedor." });
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, message = "Hubo un problema al actualizar el proveedor: " + ex.Message });
+                }
             }
-            return View(proveedore);
-        }
-
-        // GET: Proveedores/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.Proveedores == null)
+            else
             {
-                return NotFound();
+                var errorList = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return Json(new { success = false, errors = errorList });
             }
-
-            var proveedore = await _context.Proveedores
-                .FirstOrDefaultAsync(m => m.IdProveedor == id);
-            if (proveedore == null)
-            {
-                return NotFound();
-            }
-
-            return View(proveedore);
-        }
-
-        // POST: Proveedores/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (_context.Proveedores == null)
-            {
-                return Problem("Entity set 'DbPracticaContext.Proveedores'  is null.");
-            }
-            var proveedore = await _context.Proveedores.FindAsync(id);
-            if (proveedore != null)
-            {
-                _context.Proveedores.Remove(proveedore);
-            }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool ProveedoreExists(int id)
         {
-          return (_context.Proveedores?.Any(e => e.IdProveedor == id)).GetValueOrDefault();
+            return _context.Proveedores.Any(e => e.IdProveedor == id);
         }
+
+
+
+
+        // GET: Proveedores/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var proveedor = await _context.Proveedores.FirstOrDefaultAsync(m => m.IdProveedor == id);
+            if (proveedor == null)
+            {
+                return NotFound();
+            }
+
+            return View(proveedor);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id, bool deleteProducts = false)
+        {
+            var proveedor = await _context.Proveedores.FindAsync(id);
+            if (proveedor == null)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+
+                var tieneProductosAsociados = _context.Productos.Any(p => p.IdProveedor == id);
+
+                if (tieneProductosAsociados && !deleteProducts)
+                {
+                    TempData["ShowDeleteConfirmation"] = id;
+                    return RedirectToAction(nameof(Index));
+                }
+
+                if (tieneProductosAsociados && deleteProducts)
+                {
+
+                    var productosAEliminar = await _context.Productos.Where(p => p.IdProveedor == id).ToListAsync();
+                    _context.Productos.RemoveRange(productosAEliminar);
+                    await _context.SaveChangesAsync();
+                }
+
+                _context.Proveedores.Remove(proveedor);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException is SqlException sqlException)
+                {
+
+                    Console.WriteLine($"Error al eliminar proveedor: {sqlException.Message}");
+                }
+                else
+                {
+
+                    Console.WriteLine($"Error de actualización de base de datos: {ex.Message}");
+                }
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine($"Error inesperado al eliminar proveedor: {ex.Message}");
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+
+
+        //public async Task<IActionResult> Verificar(int id)
+        //{
+        //    // Verificar si hay productos asociados al proveedor
+        //    var tieneProductosAsociados = _context.Productos.Any(p => p.IdProveedor == id);
+
+        //    if (tieneProductosAsociados)
+        //    {
+        //        // Mostrar la confirmación en el Index si hay productos asociados
+        //        TempData["ShowDeleteConfirmation"] = id; // Guardar el ID del proveedor para mostrar la confirmación
+        //        return RedirectToAction(nameof(Index));
+        //    }
+
+        //}
+
+
+
     }
 }

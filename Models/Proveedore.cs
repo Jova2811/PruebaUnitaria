@@ -19,8 +19,9 @@ namespace PruebaUnitaria.Models
 
         [Required(ErrorMessage = "El campo RFC es obligatorio.")]
         [StringLength(13, ErrorMessage = "El campo RFC no puede tener más de 13 caracteres.")]
+        [RegularExpression(@"^[A-Za-z]{4}\d{6}[A-Za-z]\d{2}$", ErrorMessage = "El RFC del proveedor no cumple con el formato esperado.")]
         public string Rfc { get; set; } = null!;
 
-        
+
     }
 }

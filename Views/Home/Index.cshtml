@@ -2,7 +2,115 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>@ViewData["Title"] - PruebaUnitaria</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .hero-section {
+            background: url('https://via.placeholder.com/1200x400') no-repeat center center;
+            background-size: cover;
+            padding: 100px 0;
+            color: #fff;
+            text-align: center;
+        }
+
+            .hero-section h1 {
+                font-size: 3rem;
+                margin-bottom: 20px;
+            }
+
+            .hero-section p {
+                font-size: 1.25rem;
+            }
+
+        .btn-custom {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #fff;
+            border-radius: 50px;
+            padding: 10px 30px;
+            font-size: 1.25rem;
+        }
+
+            .btn-custom:hover {
+                background-color: #0056b3;
+                border-color: #004085;
+            }
+
+        .feature-section {
+            padding: 50px 0;
+            text-align: center;
+        }
+
+            .feature-section h2 {
+                font-size: 2.5rem;
+                margin-bottom: 30px;
+            }
+
+        .feature-card {
+            transition: transform 0.3s ease-in-out;
+        }
+
+            .feature-card:hover {
+                transform: translateY(-10px);
+            }
+    </style>
+</head>
+<body>
+
+    
+    <div class="hero-section">
+        <div class="container">
+            <h1 class="display-4">Bienvenido a la PruebaUnitaria</h1>
+            <p class="lead">Gestiona tus productos y proveedores de forma eficiente con nuestra plataforma.</p>
+            <a href="#features" class="btn btn-custom">Leer más</a>
+        </div>
+    </div>
+
+    
+    <div id="features" class="feature-section">
+        <div class="container">
+            <h2>Nuestras características</h2>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card feature-card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Administrar Proveedores</h5>
+                            <p class="card-text">Administre fácilmente a sus proveedores, realice un seguimiento de sus detalles y mantenga registros actualizados</p>
+                            <a href="/Proveedores" class="btn btn-primary">Lista de Proveedores</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card feature-card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Administrar productos</h5>
+                            <p class="card-text">Realice un seguimiento de sus productos, actualice la información y mantenga el inventario de manera eficiente.</p>
+                            <a href="/Productos" class="btn btn-primary">lista de Productos</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-4">
+        <p>&copy; 2024 PruebaUnitaria. All rights reserved.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -123,13 +123,13 @@
 </head>
 <body>
     <div class="container">
-        <h2 class="text-center mt-5">Create</h2>
+        <h2 class="text-center mt-5">Crear Proveedor</h2>
         <div class="card">
             <div class="card-header">
                 <h4 class="mb-0">Proveedor</h4>
             </div>
             <div class="card-body">
-                <form asp-action="Create">
+                <form id="createForm" asp-action="Create">
                     <div class="form-group">
                         <label asp-for="Codigo" class="control-label">Código</label>
                         <input asp-for="Codigo" class="form-control" />
@@ -146,8 +146,8 @@
                         <span asp-validation-for="Rfc" class="text-danger"></span>
                     </div>
                     <div class="form-group text-center">
-                        <button type="submit" class="btn btn-primary">Create</button>
-                        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                        <button id="submitBtn" type="submit" class="btn btn-primary">Guardar</button>
+                        <a asp-action="Index" class="btn btn-secondary">Regresar</a>
                     </div>
                 </form>
             </div>
@@ -155,11 +155,70 @@
     </div>
 
     @section Scripts {
-        @{
-            await Html.RenderPartialAsync("_ValidationScriptsPartial");
-        }
+        <partial name="_ValidationScriptsPartial" />
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            $(document).ready(function () {
+                $('#submitBtn').on('click', function (e) {
+                    e.preventDefault(); 
+
+                    
+                    $.ajax({
+                        url: $('#createForm').attr('action'),
+                        method: 'POST',
+                        data: $('#createForm').serialize(),
+                        success: function (data) {
+                            if (data.success) {
+                                
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Éxito!',
+                                    text: data.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(function () {
+                                    
+                                    window.location.href = '@Url.Action("Index", "Proveedores")';
+                                });
+                            } else {
+                                
+                                if (data.errors && data.errors.length > 0) {
+                                    var errorMessage = "<ul>";
+                                    $.each(data.errors, function (key, value) {
+                                        errorMessage += "<li>" + value + "</li>";
+                                    });
+                                    errorMessage += "</ul>";
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error!',
+                                        html: errorMessage
+                                    });
+                                } else {
+                                   
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error!',
+                                        text: 'Hubo un problema al crear el proveedor: ' + data.message
+                                    });
+                                }
+                            }
+                        },
+                        error: function () {
+                            
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: 'Hubo un problema al crear el proveedor.'
+                            });
+                        }
+                    });
+                });
+            });
+        </script>
     }
 </body>
+
 </html>
 
 

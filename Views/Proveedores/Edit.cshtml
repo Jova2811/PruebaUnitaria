@@ -137,33 +137,33 @@
 </head>
 <body>
     <div class="container">
-        <h2 class="text-center mt-5">Edit</h2>
+        <h2 class="text-center mt-5">Editar Proveedor</h2>
         <div class="card">
             <div class="card-header">
                 <h4 class="mb-0">Proveedor</h4>
             </div>
             <div class="card-body">
-                <form asp-action="Edit">
-                    <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+                <form id="editForm" asp-action="Edit">
                     <input type="hidden" asp-for="IdProveedor" />
+
                     <div class="form-group">
-                        <label asp-for="Codigo" class="control-label"></label>
+                        <label asp-for="Codigo" class="control-label">Código</label>
                         <input asp-for="Codigo" class="form-control" />
                         <span asp-validation-for="Codigo" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="RazonSocial" class="control-label"></label>
+                        <label asp-for="RazonSocial" class="control-label">Razón Social</label>
                         <input asp-for="RazonSocial" class="form-control" />
                         <span asp-validation-for="RazonSocial" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Rfc" class="control-label"></label>
+                        <label asp-for="Rfc" class="control-label">RFC</label>
                         <input asp-for="Rfc" class="form-control" />
                         <span asp-validation-for="Rfc" class="text-danger"></span>
                     </div>
-                    <div class="form-group d-flex justify-content-center gap-2">
-                        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
-                        <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back to List</a>
+                    <div class="form-group text-center">
+                        <button id="submitBtn" type="submit" class="btn btn-primary">Guardar</button>
+                        <a asp-action="Index" class="btn btn-secondary">Regresar</a>
                     </div>
                 </form>
             </div>
@@ -171,7 +171,68 @@
     </div>
 
     @section Scripts {
-        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+        <partial name="_ValidationScriptsPartial" />
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            $(document).ready(function () {
+                $('#submitBtn').on('click', function (e) {
+                    e.preventDefault();
+                    
+                    $.ajax({
+                        url: $('#editForm').attr('action'),
+                        method: 'POST',
+                        data: $('#editForm').serialize(),
+                        success: function (data) {
+                            if (data.success) {
+                                
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Éxito!',
+                                    text: data.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(function () {
+                                    
+                                    window.location.href = '@Url.Action("Index", "Proveedores")';
+                                });
+                            } else {
+                                
+                                if (data.errors && data.errors.length > 0) {
+                                    var errorMessage = "<ul>";
+                                    $.each(data.errors, function (key, value) {
+                                        errorMessage += "<li>" + value + "</li>";
+                                    });
+                                    errorMessage += "</ul>";
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error!',
+                                        html: errorMessage
+                                    });
+                                } else {
+                                    
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error!',
+                                        text: 'Hubo un problema al actualizar el proveedor: ' + data.message
+                                    });
+                                }
+                            }
+                        },
+                        error: function () {
+                            
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: 'Hubo un problema al actualizar el proveedor.'
+                            });
+                        }
+                    });
+                });
+            });
+        </script>
     }
 </body>
+o 
+
 </html>

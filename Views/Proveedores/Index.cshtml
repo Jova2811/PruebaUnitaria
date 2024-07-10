@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Index";
+
 }
 
 <!DOCTYPE html>
@@ -10,112 +11,28 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - PruebaUnitaria</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap4.min.css">
     <style>
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f8f9fa;
         }
 
-        .container {
-            max-width: 900px;
+        .container-fluid {
+            max-width: 1200px;
             margin-top: 50px;
-        }
-
-        .table {
-            width: 100%;
-            margin-bottom: 1rem;
-            color: #212529;
-        }
-
-            .table th,
-            .table td {
-                padding: 0.75rem;
-                vertical-align: middle; /* Cambiado a middle */
-                border-top: 1px solid #dee2e6;
-            }
-
-            .table thead th {
-                vertical-align: middle; /* Cambiado a middle */
-                border-bottom: 2px solid #dee2e6;
-                background-color: #007bff;
-                color: white;
-                text-align: center; /* Añadido para centrar el texto */
-            }
-
-            .table tbody + tbody {
-                border-top: 2px solid #dee2e6;
-            }
-
-            .table .table {
-                background-color: #fff;
-            }
-
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-            border-radius: 5px;
-            padding: 10px 20px;
-            color: white;
-            text-decoration: none;
-            margin-bottom: 15px;
-            display: inline-block;
-        }
-
-            .btn-primary:hover {
-                background-color: #0056b3;
-                border-color: #004085;
-            }
-
-        .btn-warning {
-            background-color: #ffc107;
-            border-color: #ffc107;
-            color: white;
-            border-radius: 5px;
-            padding: 5px 10px;
-        }
-
-            .btn-warning:hover {
-                background-color: #e0a800;
-                border-color: #d39e00;
-            }
-
-        .btn-info {
-            background-color: #17a2b8;
-            border-color: #17a2b8;
-            color: white;
-            border-radius: 5px;
-            padding: 5px 10px;
-        }
-
-            .btn-info:hover {
-                background-color: #138496;
-                border-color: #117a8b;
-            }
-
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-            color: white;
-            border-radius: 5px;
-            padding: 5px 10px;
-        }
-
-            .btn-danger:hover {
-                background-color: #c82333;
-                border-color: #bd2130;
-            }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .mt-5 {
-            margin-top: 3rem;
+            margin-bottom: 50px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
         }
 
         h2 {
             margin-bottom: 20px;
+            text-align: center;
         }
 
         .fa {
@@ -125,43 +42,118 @@
         .actions {
             display: flex;
             justify-content: center;
-            gap: 5px; /* Espacio entre botones */
+            gap: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2 class="text-center mt-5">Index</h2>
-        <a asp-action="Create" class="btn btn-primary"><i class="fa fa-plus"></i> Create New</a>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>IdProveedor</th>
-                    <th>Codigo</th>
-                    <th>RazonSocial</th>
-                    <th>Rfc</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
+    <div class="container-fluid">
+        <h2 class="mt-5">Lista de Proveedores</h2>
+
+        <div class="d-flex justify-content-center mb-3">
+            <a asp-action="Create" class="btn btn-primary"><i class="fa fa-plus"></i> Crear Nuevo</a>
+        </div>
+
+        <div class="table-responsive">
+            <table id="proveedoresTable" class="table table-striped table-bordered">
+                <thead>
                     <tr>
-                        <td>@item.IdProveedor</td>
-                        <td>@item.Codigo</td>
-                        <td>@item.RazonSocial</td>
-                        <td>@item.Rfc</td>
-                        <td>
-                            <div class="actions">
-                                <a asp-action="Edit" asp-route-id="@item.IdProveedor" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i> Edit</a>
-                                <a asp-action="Details" asp-route-id="@item.IdProveedor" class="btn btn-sm btn-info"><i class="fa fa-info-circle"></i> Details</a>
-                                <a asp-action="Delete" asp-route-id="@item.IdProveedor" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i> Delete</a>
-                            </div>
-                        </td>
+                        <th>IdProveedor</th>
+                        <th>Código</th>
+                        <th>Razón Social</th>
+                        <th>RFC</th>
+                        <th>Acciones</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var proveedor in Model)
+                    {
+                        <tr>
+                            <td>@proveedor.IdProveedor</td>
+                            <td>@proveedor.Codigo</td>
+                            <td>@proveedor.RazonSocial</td>
+                            <td>@proveedor.Rfc</td>
+                            <td class="actions">
+                                <a asp-action="Details" asp-route-id="@proveedor.IdProveedor" class="btn btn-sm btn-info"><i class="fa fa-info-circle"></i> Detalles</a>
+                                <a asp-action="Edit" asp-route-id="@proveedor.IdProveedor" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i> Editar</a>
+                                <button class="btn btn-sm btn-danger delete-button" data-id="@proveedor.IdProveedor" data-name="@proveedor.RazonSocial"><i class="fa fa-trash"></i> Eliminar</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#proveedoresTable').DataTable({
+                "language": {
+                    "lengthMenu": "Show _MENU_ entries",
+                    "zeroRecords": "No matching records found",
+                    "info": "Showing page _PAGE_ of _PAGES_",
+                    "infoEmpty": "No records available",
+                    "infoFiltered": "(filtered from _MAX_ total records)",
+                    "search": "Search:",
+                    "paginate": {
+                        "first": "First",
+                        "last": "Last",
+                        "next": "Next",
+                        "previous": "Previous"
+                    },
+                }
+            });
+        });
+    </script>
+    
+   
+    <div id="confirmModal" class="modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmación de Eliminación</h5>
+                    <button type="button" class="close" onclick="closeModal()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>¿Está seguro que desea eliminar a <span id="proveedorName"></span>?</strong> Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer">
+                    <form id="deleteForm" method="post" asp-action="Delete">
+                        <input type="hidden" name="id" id="deleteId" value="">
+                        <input type="hidden" name="deleteProducts" id="deleteId" value="true">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                $('#proveedoresTable').DataTable();
+
+                $('.delete-button').on('click', function () {
+                    var id = $(this).data('id');
+                    var name = $(this).data('name');
+                    $('#deleteId').val(id);
+                    $('#proveedorName').text(name);
+                    $('#confirmModal').modal('show');
+                });
+
+                function closeModal() {
+                    $('#confirmModal').modal('hide');
+                }
+            });
+        </script>
+    }
 </body>
 </html>

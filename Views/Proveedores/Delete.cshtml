@@ -114,14 +114,17 @@
 </head>
 <body>
     <div class="container">
-        <h2 class="text-center mt-5">Delete</h2>
+        <h2 class="text-center mt-5">Eliminar Proveedor</h2>
         <div class="card">
             <div class="card-header">
                 <h4 class="mb-0">Proveedor</h4>
             </div>
             <div class="card-body">
-                <h3 class="text-center">Are you sure you want to delete this?</h3>
+                <h3 class="text-center">¿Estás seguro de que quieres eliminar el proveedor?</h3>
                 <dl class="row">
+                    <dt class="col-sm-3">IdProveedor</dt>
+                    <dd class="col-sm-9">@Model.IdProveedor</dd>
+
                     <dt class="col-sm-3">Código</dt>
                     <dd class="col-sm-9">@Model.Codigo</dd>
 
@@ -132,13 +135,115 @@
                     <dd class="col-sm-9">@Model.Rfc</dd>
                 </dl>
                 <div class="actions">
-                    <form asp-action="Delete" method="post" class="form-inline">
-                        <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> Delete</button>
-                        <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back to List</a>
+                    <form id="deleteForm" asp-action="Delete" method="post" class="form-inline">
+                        <input type="hidden" name="id" value="@Model.IdProveedor" />
+                        <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> Eliminar</button>
+                        <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Regresar</a>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            $(document).ready(function () {
+                $('#deleteForm').on('submit', function (e) {
+                    e.preventDefault();
+
+                    
+                    var proveedorId = $("input[name='id']").val();
+
+                   
+                    $.ajax({
+                        url: '@Url.Action("DeleteConfirmed", "Proveedores")',
+                        method: 'POST',
+                        data: {
+                            id: proveedorId,
+                            deleteProducts: false 
+                        },
+                        success: function (data) {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Éxito!',
+                                    text: data.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(function () {
+                                    window.location.href = '@Url.Action("Index", "Proveedores")';
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: data.message
+                                }).then(function () {
+                                    if (data.message.includes("¿Desea eliminar también los productos?")) {
+                                        
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: 'Confirmación',
+                                            text: 'El proveedor tiene productos asociados. ¿Desea eliminar también los productos?',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Sí, eliminar todo',
+                                            cancelButtonText: 'No, cancelar'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                $.ajax({
+                                                    url: '@Url.Action("DeleteConfirmed", "Proveedores")',
+                                                    method: 'POST',
+                                                    data: {
+                                                        id: proveedorId,
+                                                        deleteProducts: true
+                                                    },
+                                                    success: function (data) {
+                                                        if (data.success) {
+                                                            Swal.fire({
+                                                                icon: 'success',
+                                                                title: 'Éxito!',
+                                                                text: data.message,
+                                                                showConfirmButton: false,
+                                                                timer: 2000
+                                                            }).then(function () {
+                                                                window.location.href = '@Url.Action("Index", "Proveedores")';
+                                                            });
+                                                        } else {
+                                                            Swal.fire({
+                                                                icon: 'error',
+                                                                title: 'Error!',
+                                                                text: data.message
+                                                            });
+                                                        }
+                                                    },
+                                                    error: function () {
+                                                        Swal.fire({
+                                                            icon: 'error',
+                                                            title: 'Error!',
+                                                            text: 'Hubo un problema al eliminar el proveedor.'
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: 'Hubo un problema al eliminar el proveedor.'
+                            });
+                        }
+                    });
+                });
+            });
+        </script>
+    }
 </body>
-</html>
+
